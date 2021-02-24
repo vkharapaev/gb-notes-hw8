@@ -81,9 +81,9 @@ public class NoteListPresenter extends ViewModel implements NoteListContract.Pre
 
     private ArrayList<Note> createNotes() {
         ArrayList<Note> notes = new ArrayList<>();
-        notes.add(new Note("Note 1", "Note 1 Description", new Date()));
-        notes.add(new Note("Note 2", "Note 2 Description", new Date()));
-        notes.add(new Note("Note 3", "Note 3 Description", new Date()));
+        for (int i = 1; i <= 100; i++) {
+            notes.add(new Note("Note " + i, "Note " + i + " Description", new Date()));
+        }
         return notes;
     }
 
