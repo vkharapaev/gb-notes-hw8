@@ -1,6 +1,7 @@
 package com.headmostlab.notes.ui.notelist;
 
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +47,7 @@ public class NoteListFragment extends Fragment implements NoteListContract.View 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         adapter = new NoteListAdapter(Collections.emptyList());
         binding.noteList.setAdapter(adapter);
+        binding.noteList.addItemDecoration(new MyItemDecoration(requireActivity()));
         presenter = new ViewModelProvider(this,
                 new NoteListViewModelFactory(this, null)).get(NoteListPresenter.class);
         presenter.takeView(this);
