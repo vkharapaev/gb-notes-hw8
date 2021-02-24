@@ -131,15 +131,18 @@ public class NoteListFragment extends Fragment implements NoteListContract.View 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
             private final NoteRowItemBinding binding;
+            private Note note;
 
             public ViewHolder(NoteRowItemBinding binding) {
                 super(binding.getRoot());
                 this.binding = binding;
+                binding.itemContainer.setOnClickListener(v -> presenter.selectNote(note));
             }
 
             void bind(Note note) {
+                this.note = note;
                 binding.title.setText(note.getTitle());
-                binding.itemContainer.setOnClickListener(v -> presenter.selectNote(note));
+                binding.description.setText(note.getDescription());
             }
         }
     }
