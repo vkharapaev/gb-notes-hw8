@@ -1,12 +1,10 @@
 package com.headmostlab.notes.ui.notelist;
 
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.headmostlab.notes.R;
 import com.headmostlab.notes.databinding.FragmentNoteListBinding;
+import com.headmostlab.notes.databinding.NoteRowItemBinding;
 import com.headmostlab.notes.model.Note;
 import com.headmostlab.notes.ui.note.NoteFragment;
 
@@ -45,13 +44,17 @@ public class NoteListFragment extends Fragment implements NoteListContract.View 
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        adapter = new NoteListAdapter(Collections.emptyList());
-        binding.noteList.setAdapter(adapter);
-        binding.noteList.addItemDecoration(new MyItemDecoration(requireActivity()));
+        initRecyclerView();
         presenter = new ViewModelProvider(this,
                 new NoteListViewModelFactory(this, null)).get(NoteListPresenter.class);
         presenter.takeView(this);
         presenter.setOrientation(getResources().getConfiguration().orientation);
+    }
+
+    private void initRecyclerView() {
+        adapter = new NoteListAdapter(Collections.emptyList());
+        binding.noteList.setAdapter(adapter);
+        binding.noteList.addItemDecoration(new MyItemDecoration(requireActivity()));
     }
 
     @Override
@@ -105,9 +108,9 @@ public class NoteListFragment extends Fragment implements NoteListContract.View 
         @Override
         public NoteListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent,
                                                              int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.note_row_item, parent, false);
-            return new ViewHolder(view);
+            NoteRowItemBinding binding =
+                    NoteRowItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+            return new ViewHolder(binding);
         }
 
         public void setNotes(List<Note> notes) {
@@ -117,8 +120,7 @@ public class NoteListFragment extends Fragment implements NoteListContract.View 
 
         @Override
         public void onBindViewHolder(@NonNull NoteListAdapter.ViewHolder holder, int position) {
-            holder.title.setText(notes.get(position).getTitle());
-            holder.container.setOnClickListener(v -> presenter.selectNote(notes.get(position)));
+            holder.bind(notes.get(position));
         }
 
         @Override
@@ -128,13 +130,16 @@ public class NoteListFragment extends Fragment implements NoteListContract.View 
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
-            public final TextView title;
-            private final ViewGroup container;
+            private final NoteRowItemBinding binding;
 
-            public ViewHolder(@NonNull View itemView) {
-                super(itemView);
-                title = itemView.findViewById(R.id.title);
-                container = itemView.findViewById(R.id.item_container);
+            public ViewHolder(NoteRowItemBinding binding) {
+                super(binding.getRoot());
+                this.binding = binding;
+            }
+
+            void bind(Note note) {
+                binding.title.setText(note.getTitle());
+                binding.itemContainer.setOnClickListener(v -> presenter.selectNote(note));
             }
         }
     }
