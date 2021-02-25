@@ -6,6 +6,8 @@ import androidx.lifecycle.SavedStateHandle;
 
 import com.headmostlab.notes.model.Note;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 
 public class NoteViewModelImpl extends androidx.lifecycle.ViewModel implements NoteViewModel {
@@ -41,15 +43,28 @@ public class NoteViewModelImpl extends androidx.lifecycle.ViewModel implements N
     }
 
     @Override
-    public void setCreateDate(Date date) {
-        Note note = this.note.getValue();
-        note.setCreationDate(date);
-        this.note.setValue(note);
-    }
-
-    @Override
     public void share() {
         noteToShare.setValue(note.getValue());
     }
+
+    @Override
+    public void save(String title, String description, String date) {
+        Note note = this.note.getValue();
+        note.setTitle(title);
+        note.setDescription(description);
+        try {
+            note.setCreationDate(DateFormat.getDateInstance().parse(date));
+        } catch (ParseException ignore) {
+        }
+        this.note.setValue(note);
+    }
+//
+//    @Override
+//    public void save(Note newNote) {
+//        Note note = this.note.getValue();
+//        note.setTitle(newNote.getTitle());
+//        note.setDescription(newNote.getDescription());
+//        note.setCreationDate(newNote.getCreationDate());
+//    }
 
 }

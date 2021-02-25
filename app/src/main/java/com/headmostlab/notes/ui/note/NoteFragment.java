@@ -75,9 +75,13 @@ public class NoteFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker().build();
         picker.addOnPositiveButtonClickListener(selection ->
-                viewModel.setCreateDate(new Date(selection)));
-        binding.pickDateButton.setOnClickListener(v ->
+                binding.createDate.setText(DateFormat.getDateInstance().format(new Date(selection))));
+        binding.createDate.setOnClickListener(v ->
                 picker.show(getParentFragmentManager(), picker.toString()));
+        binding.saveNoteButton.setOnClickListener(it ->
+                viewModel.save(binding.title.getText().toString(),
+                        binding.description.getText().toString(),
+                        binding.createDate.getText().toString()));
         viewModel.getSelectedNote().observe(getViewLifecycleOwner(), note -> show(note));
         viewModel.getNoteToShare().observe(getViewLifecycleOwner(), note -> share(note));
     }

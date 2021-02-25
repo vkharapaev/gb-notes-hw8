@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData;
 
 import com.headmostlab.notes.model.Note;
 
-import java.util.Date;
-
 public interface NoteViewModel {
 
     LiveData<Note> getSelectedNote();
@@ -14,7 +12,7 @@ public interface NoteViewModel {
 
     void setNote(Note note);
 
-    void setCreateDate(Date selection);
-
     void share();
+
+    void save(String title, String description, String date);
 }
