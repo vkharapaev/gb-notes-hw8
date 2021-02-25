@@ -10,8 +10,6 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.savedstate.SavedStateRegistryOwner;
 
-import com.headmostlab.notes.ui.note.NotePresenter;
-
 public class NoteListViewModelFactory extends AbstractSavedStateViewModelFactory
         implements ViewModelProvider.Factory {
 
@@ -22,6 +20,6 @@ public class NoteListViewModelFactory extends AbstractSavedStateViewModelFactory
     @NonNull
     @Override
     protected <T extends ViewModel> T create(@NonNull String key, @NonNull Class<T> modelClass, @NonNull SavedStateHandle handle) {
-        return (T) new NoteListPresenter(handle);
+        return (T) new NoteListViewModelImpl(handle);
     }
 }

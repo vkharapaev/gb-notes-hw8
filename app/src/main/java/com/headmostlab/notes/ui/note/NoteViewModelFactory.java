@@ -20,6 +20,6 @@ public class NoteViewModelFactory extends AbstractSavedStateViewModelFactory
     @NonNull
     @Override
     protected <T extends ViewModel> T create(@NonNull String key, @NonNull Class<T> modelClass, @NonNull SavedStateHandle handle) {
-        return (T) new NotePresenter(handle);
+        return (T) new NoteViewModelImpl(handle);
     }
 }
