@@ -23,11 +23,11 @@ import com.headmostlab.notes.model.Note;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class NoteFragment extends Fragment implements NoteContract.View {
+public class NoteFragment extends Fragment {
 
     public static final String NOTE_KEY = "NOTE";
     private FragmentNoteBinding binding;
-    private NotePresenter presenter;
+    private NoteViewModel viewModel;
 
     public static NoteFragment newNoteFragment(Note note) {
         NoteFragment fragment = new NoteFragment();
@@ -45,13 +45,13 @@ public class NoteFragment extends Fragment implements NoteContract.View {
                 Configuration.ORIENTATION_PORTRAIT;
 
         if (!isPortrait) {
-            getFragmentManager().popBackStack();
+            getParentFragmentManager().popBackStack();
         }
 
-        presenter = new ViewModelProvider(this,
-                new NoteViewModelFactory(this, null)).get(NotePresenter.class);
+        viewModel = new ViewModelProvider(this,
+                new NoteViewModelFactory(this, null)).get(NoteViewModelImpl.class);
         if (getArguments() != null) {
-            presenter.setNote(getArguments().getParcelable(NOTE_KEY));
+            viewModel.setNote(getArguments().getParcelable(NOTE_KEY));
         }
 
         setHasOptionsMenu(true);
@@ -62,27 +62,32 @@ public class NoteFragment extends Fragment implements NoteContract.View {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentNoteBinding.inflate(inflater, container, false);
-        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker().build();
-        picker.addOnPositiveButtonClickListener(selection ->
-                presenter.setCreateDate(new Date(selection)));
-        binding.pickDateButton.setOnClickListener(v ->
-                picker.show(getParentFragmentManager(), picker.toString()));
         return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        presenter.takeView(this);
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker().build();
+        picker.addOnPositiveButtonClickListener(selection ->
+                viewModel.setCreateDate(new Date(selection)));
+        binding.pickDateButton.setOnClickListener(v ->
+                picker.show(getParentFragmentManager(), picker.toString()));
+        viewModel.getSelectedNote().observe(getViewLifecycleOwner(), note -> show(note));
+        viewModel.getNoteToShare().observe(getViewLifecycleOwner(), note -> share(note));
+    }
+
     public void show(Note note) {
         binding.title.setText(note.getTitle());
         binding.description.setText(note.getDescription());
         binding.createDate.setText(DateFormat.getDateInstance().format(note.getCreationDate()));
     }
 
-    @Override
     public void share(Note note) {
         Intent sendIntent = new Intent(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, note.toHumanString());
@@ -99,7 +104,7 @@ public class NoteFragment extends Fragment implements NoteContract.View {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.action_share) {
-            presenter.share();
+            viewModel.share();
             return true;
         }
         return false;
